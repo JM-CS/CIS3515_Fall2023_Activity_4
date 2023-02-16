@@ -13,7 +13,7 @@ import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var textSizeSelector: RecyclerView
+    //lateinit var textSizeSelector: RecyclerView
     lateinit var textSizeDisplay: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,22 +24,36 @@ class MainActivity : AppCompatActivity() {
         // Verify correctness by examining array values.
         val textSizes = Array(20){(it + 1) * 5}
         //Log.d("Array vals", textSizes.contentToString())
-        textSizeSelector = findViewById(R.id.textSizeSelectorRecyclerView)
+        //textSizeSelector = findViewById(R.id.textSizeSelectorRecyclerView)
         textSizeDisplay= findViewById(R.id.textSizeDisplayTextView)
 
-        textSizeSelector.adapter = TextSizeAdapter(textSizes)
-        textSizeSelector.layoutManager = LinearLayoutManager(this)
+        with(findViewById(R.id.textSizeSelectorRecyclerView) as RecyclerView){
+            adapter = TextSizeAdapter(textSizes){
+                textSizeDisplay.textSize = it
+            }
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
+        val callback = {textSize: Float -> textSizeDisplay.textSize = textSize}
+
+        //textSizeSelector.adapter = TextSizeAdapter(textSizes, callback)
+        //textSizeSelector.layoutManager = LinearLayoutManager(this)
+
     }
 }
 
 
 /* Convert to RecyclerView.Adapter */
-class TextSizeAdapter(_textSizes: Array<Int>) : RecyclerView.Adapter<TextSizeAdapter.TextSizeViewHolder>() {
+class TextSizeAdapter(_textSizes: Array<Int>, _callBack: (Float)->Unit) : RecyclerView.Adapter<TextSizeAdapter.TextSizeViewHolder>() {
 
     val textSizes = _textSizes
+    val callBack = _callBack
 
-    class TextSizeViewHolder(view: TextView) : RecyclerView.ViewHolder(view){
+    inner class TextSizeViewHolder(view: TextView) : RecyclerView.ViewHolder(view){
         val textView = view
+
+        init {
+            textView.setOnClickListener{ callBack(textSizes[adapterPosition].toFloat())}
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TextSizeViewHolder {
