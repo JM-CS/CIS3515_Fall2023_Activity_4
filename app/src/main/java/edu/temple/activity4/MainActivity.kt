@@ -1,5 +1,6 @@
 package edu.temple.activity4
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,14 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.w3c.dom.Text
+
+const val key = "launchkey"
 
 class MainActivity : AppCompatActivity() {
 
     //lateinit var textSizeSelector: RecyclerView
     lateinit var textSizeDisplay: TextView
+
+    //val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+    //    it
+    //}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,11 +37,15 @@ class MainActivity : AppCompatActivity() {
 
         with(findViewById(R.id.textSizeSelectorRecyclerView) as RecyclerView){
             adapter = TextSizeAdapter(textSizes){
-                textSizeDisplay.textSize = it
+
+                //textSizeDisplay.textSize = it
+                val launchIntent = Intent(this@MainActivity, textSizeActivity::class.java)
+                launchIntent.putExtra(key, it)
+                startActivity(launchIntent)
             }
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
-        val callback = {textSize: Float -> textSizeDisplay.textSize = textSize}
+        //val callback = {textSize: Float -> textSizeDisplay.textSize = textSize}
 
         //textSizeSelector.adapter = TextSizeAdapter(textSizes, callback)
         //textSizeSelector.layoutManager = LinearLayoutManager(this)
@@ -52,7 +64,8 @@ class TextSizeAdapter(_textSizes: Array<Int>, _callBack: (Float)->Unit) : Recycl
         val textView = view
 
         init {
-            textView.setOnClickListener{ callBack(textSizes[adapterPosition].toFloat())}
+            textView.setOnClickListener{
+                callBack(textSizes[adapterPosition].toFloat())}
         }
     }
 
